@@ -68,7 +68,7 @@ function App() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Something went wrong.");
       setChats(prev => prev.map(c => c.id === id
-        ? { ...c, messages: [...nextMessages, { role: "assistant", content: data.reply }], updatedAt: Date.now() }
+        ? { ...c, messages: [...nextMessages, { role: "assistant", content: data.reply, sources: data.sources || [] }], updatedAt: Date.now() }
         : c));
     } catch (err) {
       setError(err.message || "Couldn't connect. Please try again.");
@@ -128,7 +128,7 @@ function App() {
           </div> : <div className="message-list">
             {messages.map((m, i) => <div key={i} className={`message-row ${m.role}`}>
               {m.role === "assistant" && <div className="message-avatar"><Sparkles size={15} /></div>}
-              <div className="message-content"><div className="message-role">{m.role === "user" ? "You" : "AQGPT"}</div><div className="message-text">{m.content}</div></div>
+              <div className="message-content"><div className="message-role">{m.role === "user" ? "You" : "AQGPT"}</div><div className="message-text">{m.content}</div>{m.role === "assistant" && m.sources?.length > 0 && <div className="source-list"><div className="source-heading">Web sources</div>{m.sources.map((source, index) => <a className="source-link" key={source.link} href={source.link} target="_blank" rel="noreferrer"><span>[{index + 1}]</span> {source.title} <span aria-hidden="true">↗</span></a>)}</div>}</div>
               {m.role === "user" && <div className="user-avatar">Y</div>}
             </div>)}
             {busy && <div className="message-row assistant"><div className="message-avatar"><Sparkles size={15} /></div><div className="message-content"><div className="message-role">AQGPT</div><div className="typing"><i /><i /><i /></div></div></div>}
